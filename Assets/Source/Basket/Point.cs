@@ -5,31 +5,20 @@ public class Point : MonoBehaviour
 {
     private int _basePoints = 1;
 
-    private bool _isGoal = false;
-
-    public event Action<int, Ball> OnGoal;
+    public event Action<int> OnGoal;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.TryGetComponent(out Ball ball))
-        {
-            if(!_isGoal)
-               Goal(ball);
+        {   
+            Goal();
+
+            transform.gameObject.SetActive(false);
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void Goal()
     {
-        if (collision.transform.TryGetComponent(out Ball ball))
-        {
-            _isGoal = _isGoal ? false : _isGoal;
-        }
-    }
-
-    private void Goal(Ball ball)
-    {
-        _isGoal = true;
-
-        OnGoal?.Invoke(_basePoints, ball);
+        OnGoal?.Invoke(_basePoints);
     }
 }

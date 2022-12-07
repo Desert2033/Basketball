@@ -8,28 +8,26 @@ public class Basket : MonoBehaviour, IPause
 
     [SerializeField] private Point _point;
 
+    [SerializeField] private BallPositionPoint _ballPositionPoint;
+
     private StateMachine _stateMachine;
 
     private Dictionary<Type, State> _states;
 
     private State _prevState;
 
-    private bool _isGoal = false;
-
-    public bool IsGoal => _isGoal;
+    public Point Point => _point;
 
     public ITargetForce TargetForce { get; private set; }
 
-    public event Action<int> OnGoal;
-
     private void OnEnable()
     {
-        _point.OnGoal += Goal;
+        _ballPositionPoint.OnGoal += SetBallPosition;
     }
 
     private void OnDisable()
     {
-        _point.OnGoal -= Goal;
+        _ballPositionPoint.OnGoal -= SetBallPosition;
     }
 
     private void Update()
@@ -43,27 +41,24 @@ public class Basket : MonoBehaviour, IPause
 
         _stateMachine = new StateMachine();
 
-        _states.Add(typeof(IdleBasket), new IdleBasket(this));
+        _states.Add(typeof(IdleBasket), new IdleBasket());
         _states.Add(typeof(AimingBasket), new AimingBasket(this, _lineTrajectory));
 
         _stateMachine.Init(_states[typeof(IdleBasket)]);
     }
 
-    public void Init(ITargetForce targetForce, bool isFirstBasket = false)
+    public void Init(ITargetForce targetForce)
     {
         TargetForce = targetForce;
 
         StateInit();
-
-        if (isFirstBasket)
-            _isGoal = true;
     }
 
     public void Refresh()
     {
         _stateMachine.Init(_states[typeof(IdleBasket)]);
 
-        _isGoal = false;
+        _point.gameObject.SetActive(true);
     }
 
     public void SetState(Type newState)
@@ -74,22 +69,15 @@ public class Basket : MonoBehaviour, IPause
             throw new Exception($"{this} don't have {newState}");
     }
 
-    public void Goal(int points, Ball ball)
+    public void SetBallPosition(Ball ball)
     {
-        ball.transform.position = _point.transform.position;
+        ball.transform.position = _ballPositionPoint.transform.position;
 
         ball.transform.parent = this.transform;
 
         ball.SetState(typeof(IdleBall));
 
-        SetState(typeof(AimingBasket));
-
-        if (!_isGoal)
-        {
-            _isGoal = true;
-
-            OnGoal?.Invoke(points);
-        }
+        SetState(typeof(AimingBasket));            
     }
 
     public void SetPause()

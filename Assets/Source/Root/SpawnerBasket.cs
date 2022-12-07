@@ -15,13 +15,9 @@ public class SpawnerBasket
         _basketSecond = basketSecond;
 
         _currentRespawn = _basketSecond;
-
-        _basketFirst.OnGoal += Spawn;
-
-        _basketSecond.OnGoal += Spawn;
     }
 
-    public void Spawn(int points)
+    public void Spawn(int point)
     {
         if (_basketFirst == _currentRespawn)
         {
@@ -51,9 +47,6 @@ public class SpawnerBasket
         float Xleft = leftBot.x;
         float Xright = rightTop.x;
 
-        float Ytop = rightTop.y;
-        float Ybot = leftBot.y;
-
         float Ymin = targetPosition.y + 4f;
         float Ymax = targetPosition.y + 6f;
 
@@ -64,5 +57,7 @@ public class SpawnerBasket
         float Xnew = Random.Range(Xmin, Xmax);
 
         respawnTarget.transform.position = new Vector2(Xnew, Ynew);
+
+        respawnTarget.transform.rotation = Quaternion.identity;
     }
 }

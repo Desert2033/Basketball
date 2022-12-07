@@ -21,7 +21,10 @@ public class Level : MonoBehaviour, IPause
 
     private void OnDisable()
     {
-        _basketFirst.OnGoal -= _score.AddPoins;
+        _basketFirst.Point.OnGoal -= _score.AddPoins;
+        _basketSecond.Point.OnGoal -= _score.AddPoins;
+        _basketFirst.Point.OnGoal -= _spawnerBasket.Spawn;
+        _basketSecond.Point.OnGoal -= _spawnerBasket.Spawn;
 
         OnPaused -= _basketFirst.SetPause;
         OnPaused -= _basketSecond.SetPause;
@@ -45,14 +48,18 @@ public class Level : MonoBehaviour, IPause
     {
         _ball.Init();
 
-        _basketFirst.Init(_ball, true);
+        _basketFirst.Init(_ball);
 
         _basketSecond.Init(_ball);
 
         _score.Init(0);
 
-        _basketFirst.OnGoal += _score.AddPoins;
-        _basketSecond.OnGoal += _score.AddPoins;
+        _spawnerBasket = new SpawnerBasket(_basketFirst, _basketSecond);
+
+        _basketFirst.Point.OnGoal += _score.AddPoins;
+        _basketSecond.Point.OnGoal += _score.AddPoins;
+        _basketFirst.Point.OnGoal += _spawnerBasket.Spawn;
+        _basketSecond.Point.OnGoal += _spawnerBasket.Spawn;
 
         OnPaused += _basketFirst.SetPause;
         OnPaused += _basketSecond.SetPause;
@@ -63,8 +70,11 @@ public class Level : MonoBehaviour, IPause
         OnUnpaused += _basketSecond.UnPause;
         OnUnpaused += _ball.UnPause;
         OnUnpaused += _menu.UnPause;
+    }
 
-        _spawnerBasket = new SpawnerBasket(_basketFirst, _basketSecond);
+    public void StartMenu()
+    {
+        _menu.MainMenu();
     }
 
     public void StartGame()

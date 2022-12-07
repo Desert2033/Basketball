@@ -74,7 +74,6 @@ public class Ball : MonoBehaviour, ITargetForce, IPause
 
     public void UnPause()
     {
-        Debug.Log(_prevState);
         _stateMachine.ChangeState(_prevState);
     }
 }
