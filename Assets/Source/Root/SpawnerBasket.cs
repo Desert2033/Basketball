@@ -27,7 +27,7 @@ public class SpawnerBasket
         {
             _currentRespawn = _basketFirst;
         }
-
+        
         _currentRespawn.Refresh();
 
         RandomPosition(_currentRespawn);
@@ -57,7 +57,6 @@ public class SpawnerBasket
         float Xnew = Random.Range(Xmin, Xmax);
 
         respawnTarget.transform.position = new Vector2(Xnew, Ynew);
-
         respawnTarget.transform.rotation = Quaternion.identity;
     }
 }

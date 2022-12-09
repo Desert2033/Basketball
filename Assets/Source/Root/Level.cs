@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Level : MonoBehaviour, IPause
 {
@@ -9,9 +10,15 @@ public class Level : MonoBehaviour, IPause
 
     [SerializeField] private Ball _ball;
 
-    [SerializeField] private ScoreView _score;
+    [SerializeField] private ScoreView _scorePoints;
+
+    [SerializeField] private ScoreView _scoreStars;
 
     [SerializeField] private Menu _menu;
+
+    [SerializeField] private CameraFollow _mainCamera;
+
+    [SerializeField] private EndGameSystem _endGameSystem;
 
     private SpawnerBasket _spawnerBasket;
 
@@ -21,10 +28,13 @@ public class Level : MonoBehaviour, IPause
 
     private void OnDisable()
     {
-        _basketFirst.Point.OnGoal -= _score.AddPoins;
-        _basketSecond.Point.OnGoal -= _score.AddPoins;
+        _basketFirst.Point.OnGoal -= _scorePoints.AddPoins;
         _basketFirst.Point.OnGoal -= _spawnerBasket.Spawn;
+        _basketFirst.Star.OnAddStar -= _scoreStars.AddPoins;
+
+        _basketSecond.Point.OnGoal -= _scorePoints.AddPoins;
         _basketSecond.Point.OnGoal -= _spawnerBasket.Spawn;
+        _basketSecond.Star.OnAddStar += _scoreStars.AddPoins;
 
         OnPaused -= _basketFirst.SetPause;
         OnPaused -= _basketSecond.SetPause;
@@ -35,10 +45,16 @@ public class Level : MonoBehaviour, IPause
         OnUnpaused -= _basketSecond.UnPause;
         OnUnpaused -= _ball.UnPause;
         OnUnpaused -= _menu.UnPause;
+
+        _endGameSystem.OnGameEnd -= _mainCamera.RemoveTargetFollow;
+        _endGameSystem.OnGameEnd -= _menu.RestartMenu;
+        _endGameSystem.OnGameEnd -= _ball.SetPause;
     }
 
     private void OnEnable()
     {
+        _menu.Init();
+
         _menu.MainMenu();
 
         InitGame();
@@ -52,14 +68,24 @@ public class Level : MonoBehaviour, IPause
 
         _basketSecond.Init(_ball);
 
-        _score.Init(0);
+        _scorePoints.Init(0);
+
+        _scoreStars.Init(0);
+
+        _mainCamera.Init(_ball.transform);
+
+        _endGameSystem.Init(_ball.transform, _basketFirst.transform, _basketSecond.transform);
 
         _spawnerBasket = new SpawnerBasket(_basketFirst, _basketSecond);
 
-        _basketFirst.Point.OnGoal += _score.AddPoins;
-        _basketSecond.Point.OnGoal += _score.AddPoins;
+        _basketFirst.Point.OnGoal += _scorePoints.AddPoins;
         _basketFirst.Point.OnGoal += _spawnerBasket.Spawn;
+        _basketFirst.Star.OnAddStar += _scoreStars.AddPoins;
+
+        _basketSecond.Point.OnGoal += _scorePoints.AddPoins;
         _basketSecond.Point.OnGoal += _spawnerBasket.Spawn;
+        _basketSecond.Star.OnAddStar += _scoreStars.AddPoins;
+
 
         OnPaused += _basketFirst.SetPause;
         OnPaused += _basketSecond.SetPause;
@@ -70,6 +96,10 @@ public class Level : MonoBehaviour, IPause
         OnUnpaused += _basketSecond.UnPause;
         OnUnpaused += _ball.UnPause;
         OnUnpaused += _menu.UnPause;
+
+        _endGameSystem.OnGameEnd += _mainCamera.RemoveTargetFollow;
+        _endGameSystem.OnGameEnd += _menu.RestartMenu;
+        _endGameSystem.OnGameEnd += _ball.SetPause;
     }
 
     public void StartMenu()
@@ -92,5 +122,10 @@ public class Level : MonoBehaviour, IPause
     public void UnPause()
     {
         OnUnpaused?.Invoke();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
     }
 }

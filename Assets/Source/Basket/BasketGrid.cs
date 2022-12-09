@@ -14,7 +14,12 @@ public class BasketGrid : MonoBehaviour
     {
         if (collision.transform.TryGetComponent(out Ball ball))
         {
-            _animation.Play();
+            CollisionWithBall();
         }
+    }
+
+    public void CollisionWithBall()
+    {
+        _animation.Play();
     }
 }

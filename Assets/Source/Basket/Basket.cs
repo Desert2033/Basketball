@@ -10,6 +10,10 @@ public class Basket : MonoBehaviour, IPause
 
     [SerializeField] private BallPositionPoint _ballPositionPoint;
 
+    [SerializeField] private Star _star;
+
+    [SerializeField] private BasketGrid _basketGrid;
+
     private StateMachine _stateMachine;
 
     private Dictionary<Type, State> _states;
@@ -17,6 +21,8 @@ public class Basket : MonoBehaviour, IPause
     private State _prevState;
 
     public Point Point => _point;
+
+    public Star Star => _star;
 
     public ITargetForce TargetForce { get; private set; }
 
@@ -59,6 +65,8 @@ public class Basket : MonoBehaviour, IPause
         _stateMachine.Init(_states[typeof(IdleBasket)]);
 
         _point.gameObject.SetActive(true);
+
+        _star.gameObject.SetActive(true);
     }
 
     public void SetState(Type newState)
@@ -77,7 +85,9 @@ public class Basket : MonoBehaviour, IPause
 
         ball.SetState(typeof(IdleBall));
 
-        SetState(typeof(AimingBasket));            
+        SetState(typeof(AimingBasket));
+
+        _basketGrid.CollisionWithBall();
     }
 
     public void SetPause()

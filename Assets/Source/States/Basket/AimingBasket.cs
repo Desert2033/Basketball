@@ -14,7 +14,6 @@ public class AimingBasket : State
 
     private float _powerHit;
     private float _minPowerHit = 4f;
-    private float _maxPowerHit = 10f;
 
     public AimingBasket(Basket basket, Trajectory lineTrajectory)
     {
@@ -67,12 +66,9 @@ public class AimingBasket : State
 
         if (_minPowerHit <= _powerHit)
         {
-            if (_maxPowerHit >= _powerHit)
-            {
-                _speed = _powerHit * (Vector3)_mouseDrag.Direction;
+            _speed = _powerHit * (Vector3)_mouseDrag.Direction;
 
-                _lineTrajectory.Show(_speed, _targetForce);
-            }
+            _lineTrajectory.Show(_speed, _targetForce);
         }
         else
         {
